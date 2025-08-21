@@ -226,10 +226,17 @@ int main(int argc, char **argv)
         }
     } else {
         if (!build_tools(&cmd, &procs)) return 1;
+        if (!procs_flush(&procs)) return 1;
+
         if (!build_assets(&cmd, &procs)) return 1;
+        if (!procs_flush(&procs)) return 1;
+
         if (!build_tests(&cmd, &procs)) return 1;
+        if (!procs_flush(&procs)) return 1;
+
         if (!build_all_vc_demos(&cmd, &procs)) return 1;
         if (!procs_flush(&procs)) return 1;
+
         if (!copy_all_vc_demos_to_build()) return 1;
     }
 
