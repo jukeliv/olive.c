@@ -56,29 +56,29 @@ bool build_tests(Cmd *cmd, Procs *procs)
     return true;
 }
 
-bool build_wasm_demo_(Cmd *cmd, Procs *procs, const char *name)
+bool build_wasm_demo(Cmd *cmd, Procs *procs, const char *name)
 {
     cmd_append(cmd, "clang", COMMON_CFLAGS, "-O2", "-fno-builtin", "--target=wasm32", "--no-standard-libraries", "-Wl,--no-entry", "-Wl,--export=vc_render", "-Wl,--export=__heap_base", "-Wl,--allow-undefined", "-o", temp_sprintf("./build/demos/%s.wasm", name), "-DVC_PLATFORM=VC_WASM_PLATFORM", temp_sprintf("./demos/%s.c", name));
     return cmd_run(cmd, .async = procs);
 }
 
-bool build_term_demo_(Cmd *cmd, Procs *procs, const char *name)
+bool build_term_demo(Cmd *cmd, Procs *procs, const char *name)
 {
     cmd_append(cmd, "clang", COMMON_CFLAGS, "-O2", "-o", temp_sprintf("./build/demos/%s.term", name), "-DVC_PLATFORM=VC_TERM_PLATFORM", "-D_XOPEN_SOURCE=600", temp_sprintf("./demos/%s.c", name), "-lm");
     return cmd_run(cmd, .async = procs);
 }
 
-bool build_sdl_demo_(Cmd *cmd, Procs *procs, const char *name)
+bool build_sdl_demo(Cmd *cmd, Procs *procs, const char *name)
 {
     cmd_append(cmd, "clang", COMMON_CFLAGS, "-O2", "-o", temp_sprintf("./build/demos/%s.sdl", name), "-DVC_PLATFORM=VC_SDL_PLATFORM", temp_sprintf("./demos/%s.c", name), "-lm", "-lSDL2", NULL);
     return cmd_run(cmd, .async = procs);
 }
 
-bool build_vc_demo_(Cmd *cmd, Procs *procs, const char *name)
+bool build_vc_demo(Cmd *cmd, Procs *procs, const char *name)
 {
-    if (!build_wasm_demo_(cmd, procs, name)) return false;
-    if (!build_term_demo_(cmd, procs, name)) return false;
-    if (!build_sdl_demo_(cmd, procs, name))  return false;
+    if (!build_wasm_demo(cmd, procs, name)) return false;
+    if (!build_term_demo(cmd, procs, name)) return false;
+    if (!build_sdl_demo(cmd, procs, name))  return false;
     return true;
 }
 
@@ -110,7 +110,7 @@ bool build_all_vc_demos(Cmd *cmd, Procs *procs)
     if (!mkdir_if_not_exists("build/demos")) return false;
 
     for (size_t i = 0; i < ARRAY_LEN(vc_demo_names); ++i) {
-        if (!build_vc_demo_(cmd, procs, vc_demo_names[i])) return false;
+        if (!build_vc_demo(cmd, procs, vc_demo_names[i])) return false;
     }
 
     return true;
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
 
             const char *name = shift(argv, argc);
             if (argc <= 0) {
-                if (build_vc_demo_(&cmd, &procs, name)) return 1;
+                if (build_vc_demo(&cmd, &procs, name)) return 1;
                 if (!procs_flush(&procs)) return 1;
                 const char *src_path = temp_sprintf("./build/demos/%s.wasm", name);
                 const char *dst_path = temp_sprintf("./wasm/%s.wasm", name);
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 
             const char *platform = shift(argv, argc);
             if (strcmp(platform, "sdl") == 0) {
-                if (!build_sdl_demo_(&cmd, &procs, name)) return 1;
+                if (!build_sdl_demo(&cmd, &procs, name)) return 1;
                 if (!procs_flush(&procs)) return 1;
                 if (argc <= 0) return 0;
                 const char *run = shift(argv, argc);
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
                 if (!cmd_run(&cmd)) return 1;
                 return 0;
             } else if (strcmp(platform, "term") == 0) {
-                if (!build_term_demo_(&cmd, &procs, name)) return 1;
+                if (!build_term_demo(&cmd, &procs, name)) return 1;
                 if (!procs_flush(&procs)) return 1;
                 if (argc <= 0) return 0;
                 const char *run = shift(argv, argc);
@@ -207,7 +207,7 @@ int main(int argc, char **argv)
                 if (!cmd_run(&cmd)) return 1;
                 return 0;
             } else if (strcmp(platform, "wasm") == 0) {
-                if (!build_wasm_demo_(&cmd, &procs, name)) return 1;
+                if (!build_wasm_demo(&cmd, &procs, name)) return 1;
                 if (!procs_flush(&procs)) return 1;
                 const char *src_path = temp_sprintf("./build/demos/%s.wasm", name);
                 const char *dst_path = temp_sprintf("./wasm/%s.wasm", name);
