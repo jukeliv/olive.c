@@ -11,8 +11,8 @@
 \begin{tikzpicture}
   \draw[-stealth] (\minZ,0) -- (\maxZ,0) node[above]{$z$};
   \draw[-stealth] (0,\minY) -- (0,\maxY) node[above]{$x$};
-  \draw[fill] (\eyeZ, \eyeY) circle (.5ex) node[above]{eye $E$};
-  \draw[dotted,thick] (\screenZ, \minY) -- (\screenZ, \maxY) node[above]{screen};
+  \draw[fill] (\eyeZ, \eyeY) circle (.5ex) node[above]{eye ($E$)};
+  \draw[dotted,thick] (\screenZ, \minY) -- (\screenZ, \maxY) node[above]{screen ($S_z$)};
   \draw[dotted] (\eyeZ, \eyeY) -- (\pZ, \pY);
   \draw[dotted] (\eyeZ, \eyeY) -- (\pZ, -\pY);
   \draw[fill] (\pZ, \pY) circle (.5ex) node[above]{$p_1$};
