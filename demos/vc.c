@@ -570,8 +570,9 @@ int main(void)
 {
     int result = 0;
 
-    Tigr *window = NULL;
-    
+    Tigr *window = tigrWindow(1,1,"",0);
+    if(!window) return_defer(1);
+
     bool pause = false;
     do {
         // Compute Delta Time
