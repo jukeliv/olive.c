@@ -822,9 +822,30 @@ OLIVECDEF void olivec_triangle3uv(Olivec_Canvas oc, int x1, int y1, int x2, int 
                 int u1, u2, det;
                 if (olivec_barycentric(x1, y1, x2, y2, x3, y3, x, y, &u1, &u2, &det)) {
                     int u3 = det - u1 - u2;
-                    float z = z1*u1/det + z2*u2/det + z3*(det - u1 - u2)/det;
-                    float tx = tx1*u1/det + tx2*u2/det + tx3*u3/det;
-                    float ty = ty1*u1/det + ty2*u2/det + ty3*u3/det;
+                    
+		    /*
+		    original code:
+		    	float z = z1*u1/det + z2*u2/det + z3*(det - u1 - u2)/det;
+                    	float tx = tx1*u1/det + tx2*u2/det + tx3*u3/det;
+                    	float ty = ty1*u1/det + ty2*u2/det + ty3*u3/det;
+		    refactoring:
+		        first of all, we have u3, so it's good to use it everywhere :p
+			float z = z1*u1/det + z2*u2/det + z3*u3/det;
+
+		    	each variable is in the form a/x + b/x + c/x, they have a common factor 1/x,
+			therefore we can join the three divisions into just one, so:
+			a/x + b/x + c/x = (a + b + c)/x
+
+			then, we are dividing tx/z and ty/z, but now we know that both of them are in the form
+			x/det, where x is just some number, therefore, we have (a/det) / (b/det), which can just be
+			rewritten as (a * 1/det) / (b * 1/det), but a*c / b*c = a/b, so this can be simplified:
+			(a/det) / (b/det) = a/b
+
+			so we can literally remove the whole division on z, tx and ty!
+		    */
+		    float z = z1*u1 + z2*u2 + z3*u3;
+		    float tx = tx1*u1 + tx2*u2 + tx3*u3;
+		    float ty = ty1*u1 + ty2*u2 + ty3*u3;
 
                     int texture_x = tx/z*texture.width;
                     if (texture_x < 0) texture_x = 0;
